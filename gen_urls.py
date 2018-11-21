@@ -1,6 +1,7 @@
 import argparse
 import codecs
 import pathlib
+import os
 
 import pandas as pd
 from tqdm import tqdm
@@ -54,9 +55,11 @@ def main():
     if not args.categories_file.exists():
         raise FileNotFoundError(args.categories_file)
     if args.urllist_file.exists():
-        raise FileExistsError(args.urllist_file)
+        # Delete the file
+        os.remove(args.urllist_file)
     if args.clist_file.exists():
-        raise FileExistsError(args.clist_file)
+        # Delete the file
+        os.remove(args.clist_file)
 
     # create dir
     args.image_dir.mkdir(parents=True, exist_ok=True)
