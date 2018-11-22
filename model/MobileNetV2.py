@@ -9,22 +9,30 @@ from tensorflow.keras.layers import Dense, Dropout, Input
 from tensorflow.keras.keras_applications.mobilenetv2 import MobileNetV2
 from tensorflow.keras.model import Model
 
-def build_model(size, alpha):
+
+def build_model(size: tuple, alpha: float) -> Model:
+    """
+    Builds a Keras Model for MobileNetV2
+    :param size: a tuple containing the dimensions of the image (X, (Y, (C)))
+    :param alpha: a float that specifies the width multiplier, greater alpha produces a larger network
+    :return: returns a Keras Model of MobileNetV2
+    :rtype: Model
+    """
     # size can be either a scalar or tuple
     # assume size refers to a square color image input
     if len(size) == 1:
         try:
-            X = Y = size
-        except TypeError:
+            X = Y = size[0]
+        except (TypeError, IndexError):
             X = Y = size
         C = 3
     # Assume size is an X by Y color image input
     elif len(size) == 2:
-        X,Y = size
+        X, Y = size
         C = 3
     # Size is an X by Y of C channel image input
     else:
-        X,Y,C = size
+        X, Y, C = size
 
     # Input shape given autoconfiguration
     input_tensor = Input(shape=(X, Y, C))
