@@ -10,29 +10,45 @@ from tensorflow.keras.keras_applications.mobilenetv2 import MobileNetV2
 from tensorflow.keras.model import Model
 
 def build_model(size, alpha):
-    input_tensor = Input(shape=(size, size, 3))
+    # size can be either a scalar or tuple
+    # assume size refers to a square color image input
+    if len(size) == 1:
+        try:
+            X = Y = size
+        except TypeError:
+            X = Y = size
+        C = 3
+    # Assume size is an X by Y color image input
+    elif len(size) == 2:
+        X,Y = size
+        C = 3
+    # Size is an X by Y of C channel image input
+    else:
+        X,Y,C = size
+
+    # Input shape given autoconfiguration
+    input_tensor = Input(shape=(X, Y, C))
+    # Use Keras applications MobileNetV2 with pretrained ImageNet weights
     base_model = MobileNetV2(
         include_top=False,
         weights='imagenet',
         input_tensor=input_tensor,
-        input_shape=(size, size, 3),
+        input_shape=(X, Y, C),
         pooling='avg')
 
+    # MobileNetV2 is frozen with ImageNet weights
     for layer in base_model.layers:
-        layer.trainable = False  # trainable has to be false in order to freeze the layers
+        layer.trainable = False
 
+    # Add a retrainable FCN with RelU activation
     op = Dense(256, activation='relu')(base_model.output)
+    # ... and dropout
     op = Dropout(.25)(op)
 
-    ##
-    # softmax: calculates a probability for every possible class.
-    #
-    # activation='softmax': return the highest probability;
-    # for example, if 'Coat' is the highest probability then the result would be
-    # something like [0,0,0,0,1,0,0,0,0,0] with 1 in index 5 indicate 'Coat' in our case.
-    ##
+    # Then a softmax classification layer, change first parameter to the number of classes
     output_tensor = Dense(10, activation='softmax')(op)
-
+    # model will include all layers required in the computation of
+    # output_tensor given input_tensor.
     model = Model(inputs=input_tensor, outputs=output_tensor)
 
     return model
