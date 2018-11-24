@@ -3,3 +3,5 @@ images
 list
 *.log
 venv
+*.ods#
+__pycache__
