@@ -32,6 +32,9 @@ if __name__ == '__main__':
     ap.add_argument('-o', '--output',
                     help='output directory to write data file',
                     default='.', type=pathlib.Path)
+    ap.add_argument('-d', '--dryrun',
+                    help='do not delete files, just print out duplicates',
+                    action='store_true')
     args = ap.parse_args()
 
     # Begin evaluating files
@@ -75,7 +78,8 @@ if __name__ == '__main__':
         for i in range(1,len(d[key])):
             logging.info('Removing duplicate: {}'.format(d[key][i]))
             try:
-                os.remove(d[key][i])
+                if not args.dryrun:
+                    os.remove(d[key][i])
             except FileNotFoundError:
                 logging.warning('Could not find file: {}'.format(d[key][i]))
 
