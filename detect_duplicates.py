@@ -35,6 +35,9 @@ if __name__ == '__main__':
     ap.add_argument('-d', '--dryrun',
                     help='do not delete files, just print out duplicates',
                     action='store_true')
+    ap.add_argument('-n','--new',
+                    help='Removes previous run data if discovered',
+                    action='store_true')
     args = ap.parse_args()
 
     # Begin evaluating files
@@ -43,6 +46,10 @@ if __name__ == '__main__':
     d = {}
     output_filepath = os.path.join(args.output, "duplicates.bin")
     # Check for duplicate data
+    if args.new:
+        logging.info('Removing old duplicate.bin file...')
+        if os.path.exists(output_filepath):
+            os.remove(output_filepath)
     if os.path.exists(output_filepath):
         logging.info('Duplicate data already exists: {}'.format(output_filepath))
         with open(output_filepath, 'rb') as pickle_fp_in:
