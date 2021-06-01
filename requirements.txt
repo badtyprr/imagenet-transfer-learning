@@ -10,4 +10,4 @@ pytz==2018.7
 requests==2.20.1
 six==1.11.0
 tqdm==4.28.1
-urllib3==1.24.1
+urllib3==1.26.5
